@@ -46,3 +46,20 @@ server.post("/demo", async (req, res) => {
     console.log("Hellp");
   }
 });
+
+// login API
+
+server.post("/login", async (req, res) => {
+  const { body } = req;
+
+  console.log(body);
+
+  const { email, password } = body;
+
+  const check = await UserSchema.findOne({
+    email: email,
+    password: password,
+  });
+
+  console.log(check);
+});
