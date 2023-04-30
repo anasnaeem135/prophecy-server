@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
 userSchema.statics.isThisEmailInUse = async function (email) {
   if (email) {
     try {
-      const user = await this.findOne({ email });
+      const user = await this.findOne({ email: email });
       if (user) {
         return false;
       }
@@ -43,7 +43,7 @@ userSchema.statics.isThisEmailInUse = async function (email) {
       return false;
     }
   }
-  throw new Error("Invalid Email");
+  throw new Error("Invalid Email or Phone Number");
 };
 
 const UserSchema = mongoose.model("users", userSchema);
