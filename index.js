@@ -24,7 +24,7 @@ server.listen(8080, () => {
   console.log("Server has started");
 });
 
-server.post("/demo", async (req, res) => {
+server.post("/signup", async (req, res) => {
   const { body } = req;
 
   const { firstName, lastName, email, phoneNo, password } = body;
@@ -43,9 +43,10 @@ server.post("/demo", async (req, res) => {
   try {
     userSchema.save();
 
-    res.json("Signed up successfully.");
+    res.status(200).send({ message: "Signed up successfully!" });
+    return true;
   } catch (error) {
-    res.json("Error");
+    res.status(404).send({ message: "Signed up failed" });
     console.error(error);
   }
 });
@@ -64,41 +65,43 @@ server.post("/login", async (req, res) => {
 
   if (user) {
     //user exists
-    res.status(200).send({ message: "Logged in successfully" });
+    res.status(200).send({ message: "Logged in successfully!" });
     return true;
-  } else {
-    //user doesn't exist
-    res.status(400).send({ message: "Invalid Email or Password" });
   }
+  res.status(404).send({ message: "Invalid Email or Password" });
+  return false;
+  //user doesn't exist
 });
 
 //
-
-let response = null;
-new Promise(async (resolve, reject) => {
-  try {
-    response = await axios.get(
-      " https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest",
-      {
-        headers: {
-          "X-CMC_PRO_API_KEY": "8c778a4e-f1ae-42b9-abe0-efb9a870d00e",
-        },
-        params: {
-          symbol: "BTC,ETH",
-        },
-      }
-    );
-  } catch (ex) {
-    response = null;
-    // error
-    console.log(ex);
-    reject(ex);
-  }
-  if (response) {
-    // success
-    const json = response.data;
-    // console.log(json.data.BTC[0].quote.USD.price);
-    console.log(json.data.ETH[0].quote.USD.price);
-    resolve(json);
-  }
+server.get("/crypto", async (req, res) => {
+  let response = null;
+  new Promise(async (resolve, reject) => {
+    try {
+      response = await axios.get(
+        " https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest",
+        {
+          headers: {
+            "X-CMC_PRO_API_KEY": "8c778a4e-f1ae-42b9-abe0-efb9a870d00e",
+          },
+          params: {
+            symbol: "BTC,ETH",
+          },
+        }
+      );
+    } catch (ex) {
+      response = null;
+      // error
+      console.log(ex);
+      reject(ex);
+    }
+    if (response) {
+      // success
+      const json = response.data;
+      // console.log(json.data.BTC[0].quote.USD.price);
+      console.log(json.data.ETH[0].quote.USD.price);
+      res.json(json.data.ETH[0].quote.USD.price);
+      resolve(json);
+    }
+  });
 });
