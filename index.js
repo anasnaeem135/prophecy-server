@@ -85,7 +85,7 @@ server.get("/crypto", async (req, res) => {
             "X-CMC_PRO_API_KEY": "8c778a4e-f1ae-42b9-abe0-efb9a870d00e",
           },
           params: {
-            symbol: "BTC,ETH",
+            symbol: "BTC,SOL,DOGE,DOT",
           },
         }
       );
@@ -99,8 +99,37 @@ server.get("/crypto", async (req, res) => {
       // success
       const json = response.data;
       // console.log(json.data.BTC[0].quote.USD.price);
-      console.log(json.data.ETH[0].quote.USD.price);
-      res.json(json.data.ETH[0].quote.USD.price);
+      // console.log(json.data);
+      res.json(json.data);
+      resolve(json);
+    }
+  });
+});
+
+server.get("/cricket", async (req, res) => {
+  let response = null;
+  new Promise(async (resolve, reject) => {
+    try {
+      response = await axios.get(
+        "https://cricket-live-data.p.rapidapi.com/fixtures",
+        {
+          headers: {
+            "X-RapidAPI-Key":
+              "577412bbd5mshc7dc2a58368aa4ap180df4jsna48c9bc6659a",
+            "X-RapidAPI-Host": "cricket-live-data.p.rapidapi.com",
+          },
+        }
+      );
+    } catch (ex) {
+      response = null;
+      // error
+      console.log(ex);
+      reject(ex);
+    }
+    if (response) {
+      // success
+      const json = response.data;
+      res.json(json);
       resolve(json);
     }
   });
