@@ -1,24 +1,26 @@
+const fs = require("fs");
+const path = require("path");
 const cors = require("cors");
 const axios = require("axios");
 const multer = require("multer");
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const fs = require("fs");
-const path = require("path");
+const constants = require("./constants");
+
+const { CONNECTION_STRING, API_KEY_COIN_MARKET_CAP, API_KEY_RAPID_API } =
+  constants;
 
 const server = express();
 
 server.use(cors());
 server.use(bodyParser.json());
+server.use("/advertisments", express.static("advertisments"));
 
 const UserSchema = require("./models/channel");
 
-const DB =
-  "mongodb+srv://anas:forbidden@prophecy.lmsu61v.mongodb.net/Prophecy?retryWrites=true&w=majority";
-
 mongoose
-  .connect(DB)
+  .connect(CONNECTION_STRING)
   .then(() => {
     console.log("Connection Successful");
   })
@@ -30,7 +32,7 @@ server.listen(8080, () => {
   console.log("Server has started");
 });
 
-// signup Api
+// signup API
 server.post("/signup", async (req, res) => {
   const { body } = req;
 
@@ -106,7 +108,7 @@ server.post("/uploadAdvertisment", function (req, res) {
 });
 
 server.get("/getAdvertisments", (req, res) => {
-  const imagesFolder = path.join(__dirname, "images");
+  const imagesFolder = path.join(__dirname, "advertisments");
 
   fs.readdir(imagesFolder, (err, files) => {
     if (err) {
@@ -123,7 +125,7 @@ server.get("/getAdvertisments", (req, res) => {
 
     // Create an array of image URLs or image data
     const images = imageFiles.map((file) => {
-      const imageUrl = `/images/${file}`;
+      const imageUrl = `/advertisments/${file}`;
       // If you want to send base64-encoded image data instead of URLs:
       // const imageData = fs.readFileSync(path.join(imagesFolder, file), 'base64');
       return imageUrl;
@@ -142,7 +144,7 @@ server.get("/crypto", async (req, res) => {
         " https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest",
         {
           headers: {
-            "X-CMC_PRO_API_KEY": "8c778a4e-f1ae-42b9-abe0-efb9a870d00e",
+            "X-CMC_PRO_API_KEY": API_KEY_COIN_MARKET_CAP,
           },
           params: {
             symbol: "BTC,SOL,DOGE,DOT,BNB,SHIB",
@@ -174,8 +176,7 @@ server.get("/cricket", async (req, res) => {
         "https://cricket-live-data.p.rapidapi.com/fixtures",
         {
           headers: {
-            "X-RapidAPI-Key":
-              "577412bbd5mshc7dc2a58368aa4ap180df4jsna48c9bc6659a",
+            "X-RapidAPI-Key": API_KEY_RAPID_API,
             "X-RapidAPI-Host": "cricket-live-data.p.rapidapi.com",
           },
         }
