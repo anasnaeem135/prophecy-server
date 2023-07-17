@@ -117,17 +117,14 @@ server.get("/getAdvertisments", (req, res) => {
       return;
     }
 
-    // Filter out non-image files if necessary
     const imageFiles = files.filter((file) => {
       const extension = path.extname(file).toLowerCase();
       return [".jpg", ".jpeg", ".png"].includes(extension);
     });
 
-    // Create an array of image URLs or image data
     const images = imageFiles.map((file) => {
       const imageUrl = `/advertisments/${file}`;
-      // If you want to send base64-encoded image data instead of URLs:
-      // const imageData = fs.readFileSync(path.join(imagesFolder, file), 'base64');
+
       return imageUrl;
     });
 
@@ -147,7 +144,7 @@ server.get("/crypto", async (req, res) => {
             "X-CMC_PRO_API_KEY": API_KEY_COIN_MARKET_CAP,
           },
           params: {
-            symbol: "BTC,SOL,DOGE,DOT,BNB,SHIB",
+            symbol: "BTC,SOL,DOGE,DOT,BNB,SHIB,MATIC",
           },
         }
       );
@@ -196,58 +193,23 @@ server.get("/cricket", async (req, res) => {
   });
 });
 
-// server.get("/football", async (req, res) => {
-//   let response = null;
-//   new Promise(async (resolve, reject) => {
-//     try {
-//       const id = 2224;
-//       response = await axios.get(
-//         "https://api-football-v1.p.rapidapi.com/v3/fixtures",
-//         {
-//           params: { next: "50" },
-//           headers: {
-//             "X-RapidAPI-Key":
-//               "577412bbd5mshc7dc2a58368aa4ap180df4jsna48c9bc6659a",
-//             "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com",
-//           },
-//         }
-//       );
-//     } catch (ex) {
-//       response = null;
-//       // error
-//       console.log(ex);
-//       reject(ex);
-//     }
-//     if (response) {
-//       // success
-//       const json = response.data;
+server.get("/football", async (req, res) => {
+  new Promise(async (resolve, reject) => {
+    try {
+      const options = {
+        method: "GET",
+        url: "https://api-football-v1.p.rapidapi.com/v3/fixtures",
+        params: { next: "50" },
+        headers: {
+          "X-RapidAPI-Key": API_KEY_RAPID_API,
+          "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com",
+        },
+      };
 
-//       res.json(json);
-//       resolve(json);
-//     }
-//   });
-// });
-
-// server.get("/football", async (req, res) => {
-// const axios = require("axios");
-
-// const options = {
-//   method: "GET",
-//   url: "https://livescore6.p.rapidapi.com/matches/v2/list-live",
-//   params: {
-//     Category: "soccer",
-//     Timezone: "-7",
-//   },
-//   headers: {
-//     "X-RapidAPI-Key": "577412bbd5mshc7dc2a58368aa4ap180df4jsna48c9bc6659a",
-//     "X-RapidAPI-Host": "livescore6.p.rapidapi.com",
-//   },
-// };
-// new Promise(async (resolve, reject) => {
-//   try {
-//     const response = await axios.request(options);
-//     console.log("Soccer data : ", response.data);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// });
+      const response = await axios.request(options);
+      res.json(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+});
